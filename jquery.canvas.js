@@ -15,10 +15,6 @@ $.fn.drawPath = function(options){
 		
 	    controlPointsX:[0,10,50,37,200],
         controlPointsY:[0,150,350,20,600],
-		lineWidth:1,
-		lineJoin:'round',
-		lineColor:"#000000",
-		lineCap:"round"
 		
 		
 	}, options);
@@ -32,17 +28,6 @@ $.fn.drawPath = function(options){
 	that.lineTo(defaults.controlPointsX[i],defaults.controlPointsY[i]);    
 	}
 	
-	if(defaults.closePath()){ that.closePath()}
-        if (defaults.fill){ 
-             context.fillStyle = defaults.fillStyle;
-             context.fill();
-            }
-	that.lineWidth = defaults.lineWidth;
-	that.lineJoin = defaults.lineJoin;
-	that.strokeStyle = defaults.lineColor;
-	that.lineCap = defaults.lineCap;
-	that.stroke();
-
 	})
 	
 }
@@ -57,9 +42,6 @@ $.fn.drawArc = function(options){
         startAngle:1.0,
         endAngle:1.9,
         counterClockwise: true,
-        lineWidth:1,
-        lineColor:"#000000",
-        lineCap:"round"
         
     }, options);
     return this.each(function(){
@@ -67,10 +49,6 @@ $.fn.drawArc = function(options){
     
     that.beginPath();
     that.arc(defaults.x, defaults.y, defaults.radius, defaults.startAngle*Math.PI, defaults.endAngle*Math.PI, defaults.counterClockwise);
-     that.lineWidth = defaults.lineWidth;
-     that.strokeStyle = defaults.lineColor;
-     that.lineCap = defaults.lineCap;
-    that.stroke();
 
     })
     
@@ -83,9 +61,6 @@ $.fn.drawCurve = function(options){
     var defaults = $.extend({
         controlPointsX:[0,150,100,150,200],
         controlPointsY:[0,150,70,70,200],
-        lineWidth:1,
-        lineColor:"#000000",
-        lineCap:"round",
     }, options);
     return this.each(function(){
        var lengthX = defaults.controlPointsX.length, 
@@ -117,22 +92,11 @@ $.fn.drawCurve = function(options){
         }
         
     }
-
-        if(defaults.closePath()){ that.closePath()}
-        if (defaults.fill){ 
-             context.fillStyle = defaults.fillStyle;
-             context.fill();
-            }
-      that.lineWidth = defaults.lineWidth;
-      that.strokeStyle = defaults.lineColor;
-      that.lineCap = defaults.lineCap;
-    that.stroke();
-
     })
     
 }
 //closing path
-$.fn.close = function(options){
+$.fn.close = function(){
     return this.each(function(){
         
     that = $(this)[0];
@@ -142,28 +106,167 @@ $.fn.close = function(options){
     
 }
 
-$.fn.fillPath = function(options){
+//Fill types
+$.fn.solidFill = function(options){
 
     
     var defaults = $.extend({
-        fillType:'solid',
-        colors:['yellow','blue']
+        
+        color:['yellow']
     }, options);
 
     return this.each(function(){
         
     that = $(this)[0];
     
-    if (defaults.fillType == 'solid'){
-        context.fillStyle = defaults.colors[0];
-        context.fill();
-    }else if (defaults.fillType == 'gradient'){
-        
-    }else{
-        console.error('Fill type must be "solid" or "gradient" ')
-        return false;
-    }
+    that.fillStyle = defaults.color;
+    that.fill();
 
     })
     
 }
+
+$.fn.gradientFillSolid = function(options){
+
+    
+    var defaults = $.extend({
+        colors:['yellow','blue'],
+        startX:0,
+        startY:0,
+        endX:300,
+        endY:300
+    }, options);
+
+    return this.each(function(){
+        
+    that = $(this)[0];
+    var grd =  that.createLinearGradient(defaults.startX,defaults.startY, defaults.endX, defaults.endY), colorsLength = defaults.colors.length;
+    
+    for (var i=0; i<colorsLength; i++){
+        
+            grd.addColorStop(i,defaults.colors[i]);
+    }
+        that.fillStyle=grd;
+        that.fill();
+    })
+    
+}
+
+$.fn.gradientFillRadial = function(options){
+
+    
+    var defaults = $.extend({
+        colors:['yellow','blue'],
+        startX:238,
+        startY:50,
+        endX:238,
+        endY:50,
+        startRadius:10,
+        endRadius:300
+    }, options);
+
+    return this.each(function(){
+        
+    that = $(this)[0];
+    
+    var grd =  that.createRadialGradient(defaults.startX,defaults.startY, defaults.startRadius,defaults.endX, defaults.endY, defaults.endRadius), colorsLength = defaults.colors.length;
+    console.log("dupa")
+    for (var i=0; i<colorsLength; i++){
+        
+            grd.addColorStop(i,defaults.colors[i]);
+    }
+        that.fillStyle=grd;
+        that.fill();
+    })
+    
+}
+
+
+$.fn.patternFill = function(options){
+
+    
+    var defaults = $.extend({
+        imgSrc:'',
+        repeatType:'repeat',
+    }, options);
+
+    return this.each(function(){
+        
+    that = $(this)[0];
+    var imgObj = new Image();
+    
+    imgObj.onload = function() {
+    var pattern = that.createPattern(imgObj, defaults.repeatType);
+    that.fillStyle=pattern;
+      that.fill(); 
+    }
+    imgObj.src = defaults.imgSrc;
+
+    })
+    
+}
+$.fn.stroke = function(options){
+
+    
+    var defaults = $.extend({
+       lineWidth:1,
+        lineColor:"#000000",
+        lineCap:"round",
+        lineJoin:'butt'
+        
+    }, options);
+
+    return this.each(function(){
+        
+    that = $(this)[0];
+    
+        that.lineWidth = defaults.lineWidth;
+    that.lineJoin = defaults.lineJoin;
+    that.strokeStyle = defaults.lineColor;
+    that.lineCap = defaults.lineCap;
+    that.stroke();
+    });
+    
+}
+
+
+//Shapes
+$.fn.rectangle = function(options){
+
+    
+    var defaults = $.extend({
+        startX:238,
+        startY:50,
+        endX:238,
+        endY:50
+    }, options);
+
+    return this.each(function(){
+        
+    that = $(this)[0];
+    
+     that.beginPath();
+    that.rect(defaults.startX, defaults.startY, defaults.endX, defaults.endY);
+    });
+    
+}
+
+
+$.fn.circle = function(options){
+
+    var defaults = $.extend({
+        
+        x:150,
+        y:150,
+        radius:75,
+      
+    }, options);
+    return this.each(function(){
+    that = $(this)[0];
+    
+    that.beginPath();
+    that.arc(defaults.x, defaults.y, defaults.radius, 0, 2*Math.PI, false);
+    })
+    
+}
+
