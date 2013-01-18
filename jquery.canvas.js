@@ -212,7 +212,8 @@ $.fn.stroke = function(options){
        lineWidth:1,
         lineColor:"#000000",
         lineCap:"round",
-        lineJoin:'butt'
+        lineJoin:'butt',
+        text: false
         
     }, options);
 
@@ -224,7 +225,11 @@ $.fn.stroke = function(options){
     that.lineJoin = defaults.lineJoin;
     that.strokeStyle = defaults.lineColor;
     that.lineCap = defaults.lineCap;
-    that.stroke();
+    if (defaults.text){
+    } else {
+    that.stroke();    
+    }
+    
     });
     
 }
@@ -270,3 +275,34 @@ $.fn.circle = function(options){
     
 }
 
+//images
+
+
+
+
+//fonts
+
+$.fn.text = function(options){
+
+    
+    var defaults = $.extend({
+        style:'italic',
+        size:40,
+        font:'Calibri',
+        text:'Hello World',
+        x:100,
+        y:100
+    }, options);
+
+    return this.each(function(){
+        
+    that = $(this)[0];
+   
+    that.font = ' '+ defaults.style + ' ' + defaults.size + 'pt ' + defaults.font;
+    
+    console.log(that.font);
+    that.fillText(defaults.text, defaults.x, defaults.y);
+   
+    })
+    
+}
