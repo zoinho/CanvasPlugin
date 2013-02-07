@@ -277,7 +277,60 @@ $.fn.circle = function(options){
 
 //images
 
+//Wymagaja stworzenia obiektu z odpowiednimi wielkościami i podania go w parametrach razem z okresleniem  wielkosci i cropowania
+ /*
+ przykladowy obiekt :
+ var img = {
+    src : "http://www.jesus-is-savior.com/End%20of%20the%20World/dragon_2.jpg",
+    x: 0,
+    y:0,
+    width: 550,
+    height:550,
+    dx: 100,
+    dy:150,
+    dwidth:50,
+    dheight:50
+ }
 
+  */
+ $.fn.drawImage = function(object, options){
+
+     var defaults = $.extend({
+
+         sizing:false,
+         cropping:false
+
+     }, options);
+     return this.each(function(){
+         that = $(this)[0];
+         IMG = new Image();
+
+
+        if(defaults.cropping){
+            IMG.onload = function() {
+                that.drawImage(IMG, object.x, object.y, object.width, object.height, object.dx, object.dy, object.dwidth, object.dheight);
+            };
+
+        }
+        else if (defaults.sizing){
+
+            IMG.onload = function() {
+                that.drawImage(IMG, object.x, object.y, object.width, object.height);
+            };
+
+             }
+         else {
+
+            IMG.onload = function() {
+                that.drawImage(IMG, object.x, object.y);
+            };
+
+       }
+         IMG.src = object.src;
+         })
+
+
+ }
 
 
 //fonts
@@ -290,6 +343,10 @@ $.fn.text = function(options){
         size:40,
         font:'Calibri',
         text:'Hello World',
+        fill:true,
+        fillColor:'',
+        strokeColor:'',
+        strokeWidth:'',
         x:100,
         y:100
     }, options);
@@ -306,3 +363,4 @@ $.fn.text = function(options){
     })
     
 }
+
