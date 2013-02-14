@@ -14,7 +14,7 @@ $.fn.drawPath = function(options){
 	var defaults = $.extend({
 		
 	    controlPointsX:[0,10,50,37,200],
-        controlPointsY:[0,150,350,20,600],
+        controlPointsY:[0,150,350,20,600]
 		
 		
 	}, options);
@@ -41,7 +41,7 @@ $.fn.drawArc = function(options){
         radius:75,
         startAngle:1.0,
         endAngle:1.9,
-        counterClockwise: true,
+        counterClockwise: true
         
     }, options);
     return this.each(function(){
@@ -60,7 +60,7 @@ $.fn.drawCurve = function(options){
 
     var defaults = $.extend({
         controlPointsX:[0,150,100,150,200],
-        controlPointsY:[0,150,70,70,200],
+        controlPointsY:[0,150,70,70,200]
     }, options);
     return this.each(function(){
        var lengthX = defaults.controlPointsX.length, 
@@ -187,7 +187,7 @@ $.fn.patternFill = function(options){
     
     var defaults = $.extend({
         imgSrc:'',
-        repeatType:'repeat',
+        repeatType:'repeat'
     }, options);
 
     return this.each(function(){
@@ -263,7 +263,7 @@ $.fn.circle = function(options){
         
         x:150,
         y:150,
-        radius:75,
+        radius:75
       
     }, options);
     return this.each(function(){
@@ -335,32 +335,76 @@ $.fn.circle = function(options){
 
 //fonts
 
-$.fn.text = function(options){
+ $.fn.text = function(options){
 
-    
-    var defaults = $.extend({
-        style:'italic',
-        size:40,
-        font:'Calibri',
-        text:'Hello World',
-        fill:true,
-        fillColor:'',
-        strokeColor:'',
-        strokeWidth:'',
-        x:100,
-        y:100
-    }, options);
+     var defaults = $.extend({
 
-    return this.each(function(){
-        
-    that = $(this)[0];
-   
-    that.font = ' '+ defaults.style + ' ' + defaults.size + 'pt ' + defaults.font;
-    
-    console.log(that.font);
-    that.fillText(defaults.text, defaults.x, defaults.y);
-   
-    })
-    
-}
+         x:150,
+         y:150,
+         text:""
+
+     }, options);
+     return this.each(function(){
+         that = $(this)[0];
+         that.fillText(defaults.text, defaults.x, defaults.y);
+     })
+
+ }
+
+ $.fn.fonts = function(options){
+
+     var defaults = $.extend({
+
+         style:"normal",
+         size:10,
+         font:"Calibri"
+
+     }, options);
+     return this.each(function(){
+         that = $(this)[0];
+         that.font(defaults.style, defaults.size +"px", defaults.font);
+     })
+
+ }
+ $.fn.textColor = function(options){
+
+     var defaults = $.extend({
+
+         color:"blue"
+     }, options);
+     return this.each(function(){
+         that = $(this)[0];
+
+         that.fillStyle(defaults.color);
+     })
+
+ }
+ $.fn.textAlign = function(options){
+
+     var defaults = $.extend({
+
+         align:"center"
+     }, options);
+     return this.each(function(){
+         that = $(this)[0];
+
+         that.textAlign(defaults.align);
+     })
+
+ }
+ $.fn.textBaseline = function(options){
+
+     var defaults = $.extend({
+
+         baseline:"alphabetic"
+     }, options);
+     return this.each(function(){
+         that = $(this)[0];
+
+         that.textBaseline(defaults.baseline);
+     })
+
+ }
+
+
 
