@@ -347,6 +347,7 @@ $.fn.circle = function(options){
      return this.each(function(){
          that = $(this)[0];
          that.fillText(defaults.text, defaults.x, defaults.y);
+         that.strokeText(defaults.text, defaults.x, defaults.y);
      })
 
  }
@@ -379,6 +380,19 @@ $.fn.circle = function(options){
      })
 
  }
+ $.fn.strokeColor = function(options){
+
+     var defaults = $.extend({
+
+         color:"blue"
+     }, options);
+     return this.each(function(){
+         that = $(this)[0];
+
+         that.strokeStyle(defaults.color);
+     })
+
+ }
  $.fn.textAlign = function(options){
 
      var defaults = $.extend({
@@ -406,5 +420,144 @@ $.fn.circle = function(options){
 
  }
 
+
+// Transforms
+
+ $.fn.translate = function(options){
+
+     var defaults = $.extend({
+
+         x:0,
+         y:0
+     }, options);
+     return this.each(function(){
+         that = $(this)[0];
+
+         that.translate(defaults.x, defaults.y);
+     })
+ }
+
+ $.fn.scale = function(options){
+
+     var defaults = $.extend({
+
+         x:0,
+         y:0
+     }, options);
+     return this.each(function(){
+         that = $(this)[0];
+         that.scale(defaults.x, defaults.y);
+     })
+ }
+ $.fn.rotate = function(options){
+
+     var defaults = $.extend({
+
+         angle:0
+     }, options);
+     return this.each(function(){
+         that = $(this)[0];
+
+         that.rotate(defaults.angle);
+     })
+ }
+ $.fn.transform = function(options){
+
+     var defaults = $.extend({
+
+         a:0,
+         b:0,
+         c:0,
+         d:0,
+         e:0,
+         f:0
+     }, options);
+     return this.each(function(){
+         that = $(this)[0];
+
+         that.transform(defaults.a, defaults.b, defaults.c, defaults.d, defaults.e, defaults.f)
+     })
+ }
+
+ $.fn.shear = function(options){
+
+     var defaults = $.extend({
+
+         sx:0,
+         sy:0,
+     }, options);
+     return this.each(function(){
+         that = $(this)[0];
+
+         that.transform(1 ,defaults.sy, defaults.sx, 1, 0, 0);
+     })
+ }
+
+ $.fn.resetTransform = function(options){
+
+     return this.each(function(){
+         that = $(this)[0];
+
+         that.setTransform(1, 0, 0, 1, 0, 0);
+     })
+ }
+
+///TODO dopisac customowe transformacje macierzy przekstałceń
+
+ //Shadows
+
+ $.fn.shadowColor = function(options){
+
+     var defaults = $.extend({
+
+         color:'black'
+     }, options);
+     return this.each(function(){
+         that = $(this)[0];
+
+         that.shadowColor(defaults.color);
+     })
+ }
+
+ $.fn.shadowBlur = function(options){
+
+     var defaults = $.extend({
+
+         blur:0
+     }, options);
+     return this.each(function(){
+         that = $(this)[0];
+
+         that.shadowBlur(defaults.blur);
+     })
+ }
+
+ $.fn.shadowOffset = function(options){
+
+     var defaults = $.extend({
+
+         x:10,
+         y:10
+     }, options);
+     return this.each(function(){
+         that = $(this)[0];
+
+         that.shadowOffsetX(defaults.x);
+         that.shadowOffsetY(defaults.y);
+     })
+ }
+//Opacity
+ $.fn.opacity = function(options){
+
+     var defaults = $.extend({
+
+         opacty:0
+     }, options);
+     return this.each(function(){
+         that = $(this)[0];
+
+         that.globalAlpha(defaults.opacty);
+     })
+ }
 
 
