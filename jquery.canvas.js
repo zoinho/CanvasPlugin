@@ -29,8 +29,25 @@
  }
 
 
- $.fn.pushObject = function(name,object){
+ $.fn.pushObject = pushObject;
+ function pushObject(name,object){
+ 
+ 	 var defaults = $.extend({
+         fill:'stroke'
+     }, object);
      that = $(this)[0];
+     that.functions = {
+     	'arc':'drawArc',
+     	'curve':'drawCurve',
+     	'path':'drawPath',
+     	'circle':'drawCircle',
+     	'rectangle':'drawRectangle',
+     	'text':'drawText',
+     	'stroke':'stroke',
+     	'solid':'solidFill',
+     	
+     }
+     
      if(that.hasOwnProperty("objects")){
          console.log("sa objects")
          that.objects[name]=object;
@@ -38,19 +55,25 @@
          that.objects ={};
          that.objects[name]=object;
      }
+     that.objects[name].fn = that.functions[that.objects[name].type];
+     that.objects[name].fillType = that.functions[defaults.fill];
 
-
-     return this.each(function(){})
-
+     return this.each(function(){
+     
+     $(that)['draw']()
+     })
  }
 
- $.fn.popObject = function(name){
+ $.fn.popObject = popObject;
+  function popObject(name){
      that = $(this)[0];
      if(that.hasOwnProperty("objects")){
          console.log("sa objects")
          delete that.objects[name];
      }
-     return this.each(function(){})
+     return this.each(function(){
+     	$(that)['draw']();
+     })
 
  }
   //Manipulacja layerami tlyko na contextach
@@ -75,7 +98,7 @@
 
   }
   $.fn.layerOver = function(id){
- debugger;
+ 
       var index = $("canvas#"+id).attr("z-index");
       return this.each(function(){
 
@@ -94,6 +117,30 @@
       })
 
   }
+    
+$.fn.draw = draw; 
+function draw(){
+
+	var that = $(this)[0];
+	
+	$(that)['reset']();
+	   return this.each(function(){
+	  
+	   for (object in that.objects){
+	   		var obj = that.objects[object], fn = obj.fn, fillType = obj.fillType
+	   		
+	   		console.log(fn);
+	   		$(that)[fn](obj);
+	   		$(that)[fillType]();
+	   		
+	   		
+	   }
+	   
+	   })
+
+	
+
+}
 
   //Save context
   $.fn.saveContext = function(){
@@ -144,7 +191,8 @@
 
   }
   //pozwala na rysowanie sciezek i pojedynczych linii w zaleznosci od liczby argmentow!
- $.fn.drawPath = function(options){
+ $.fn.drawPath = drawPath;
+ function drawPath(options){
 
      var defaults = $.extend({
 
@@ -168,7 +216,8 @@
 
  }
 
- $.fn.drawArc = function(options){
+ $.fn.drawArc = drawArc;
+ function drawArc(options){
 
      var defaults = $.extend({
 
@@ -192,15 +241,16 @@
 
 
  //  Curves - you can give more than 2 control points!
- $.fn.drawCurve = function(options){
+ $.fn.drawCurve = drawCurve
+ function drawCurve(options){
 
      var defaults = $.extend({
-         controlPointsX:[0,150,100,150,200],
-         controlPointsY:[0,150,70,70,200]
+         x:[0,150,100,150,200],
+         y:[0,150,70,70,200]
      }, options);
      return this.each(function(){
-        var lengthX = defaults.controlPointsX.length,
-        lengthY = defaults.controlPointsY.length;
+        var lengthX = defaults.x.length,
+        lengthY = defaults.y.length;
 
         if (lengthX !== lengthY){
             console.error("Bad number of arguments of X's or Y's");
@@ -217,14 +267,14 @@
      if(lengthX % 2 == 0){
          //nieparzysta liczba argumentow - wykorzystujemy tylko krzywe beziera (bierzemy co cztery wspolrzedne - poczatek, dwa punkty kontrolne i punkt koncowy), po czym przeskakujemy o cztery do przodu w tablicy i powtarzamy proces.
          for (var i=0; i<lengthX; i+=3){
-             that.moveTo(defaults.controlPointsX[i], defaults.controlPointsY[i]);
-             that.bezierCurveTo(defaults.controlPointsX[i+1], defaults.controlPointsY[i+1],defaults.controlPointsX[i+2], defaults.controlPointsY[i+2],defaults.controlPointsX[i+3], defaults.controlPointsY[i+3])
+             that.moveTo(defaults.x[i], defaults.y[i]);
+             that.bezierCurveTo(defaults.x[i+1], defaults.y[i+1],defaults.x[i+2], defaults.y[i+2],defaults.x[i+3], defaults.y[i+3])
          }
 
      } else {
          for (var i=0; i<lengthX; i+=2){
-             that.moveTo(defaults.controlPointsX[i], defaults.controlPointsY[i]);
-             that.quadraticCurveTo(defaults.controlPointsX[i+1], defaults.controlPointsY[i+1],defaults.controlPointsX[i+2], defaults.controlPointsY[i+2])
+             that.moveTo(defaults.x[i], defaults.y[i]);
+             that.quadraticCurveTo(defaults.x[i+1], defaults.y[i+1],defaults.x[i+2], defaults.y[i+2])
          }
 
      }
@@ -243,7 +293,8 @@
  }
 
  //Fill types
- $.fn.solidFill = function(options){
+ $.fn.solidFill = solidFill;
+ function solidFill(options){
 
 
      var defaults = $.extend({
@@ -341,7 +392,8 @@
      })
 
  }
- $.fn.stroke = function(options){
+ $.fn.stroke = stroke;
+ function stroke(options){
 
 
      var defaults = $.extend({
@@ -372,7 +424,8 @@
 
 
  //Shapes
- $.fn.rectangle = function(options){
+ $.fn.drawRectangle = drawRectangle;
+  function drawRectangle(options){
 
 
      var defaults = $.extend({
@@ -393,7 +446,8 @@
  }
 
 
- $.fn.circle = function(options){
+ $.fn.drawCircle = drawCircle;
+  function drawCircle(options){
 
      var defaults = $.extend({
 
@@ -429,7 +483,8 @@
   }
 */
 
-  $.fn.drawImage = function(object, options){
+  $.fn.drawImage = drawImage;
+  function drawImage(object, options){
 
       var defaults = $.extend({
 
@@ -471,7 +526,8 @@
 
  //fonts
 
-  $.fn.text = function(options){
+  $.fn.drawText = drawText;
+   function drawText(options){
 
       var defaults = $.extend({
 
@@ -546,8 +602,61 @@
 
  // Transforms
 
-  $.fn.translate = function(options){
+  $.fn.translate = translate;
+  function translate(object,options){
+	
+		var name = object, 
+		tmp=that.objects[name],
+		defaults = $.extend({
 
+          x:0,
+          y:0
+      }, options);
+      return this.each(function(){
+          that = $(this)[0];
+
+			$(that)['popObject'](name);
+			tmp.x=defaults.x;
+			tmp.y=defaults.y;
+			$(that)['pushObject'](name,tmp);
+			$(that)['draw']();
+          
+      })
+  }
+    $.fn.translateX = translateX;
+  function translateX(object,coord){
+	
+		var name = object, 
+		tmp=that.objects[name];
+	
+      return this.each(function(){
+          that = $(this)[0];
+
+			$(that)['popObject'](name);
+			tmp.x=coord;
+			$(that)['pushObject'](name,tmp);
+			$(that)['draw']();
+          
+      })
+  }
+    $.fn.translateY = translateY;
+  function translateY(object,coord){
+	
+		var name = object, 
+		tmp=that.objects[name];
+		
+      return this.each(function(){
+          that = $(this)[0];
+
+			$(that)['popObject'](name);
+			tmp.y=coord;
+			$(that)['pushObject'](name,tmp);
+			$(that)['draw']();
+          
+      })
+  }
+  $.fn.translateCanvas = function(object,options){
+	
       var defaults = $.extend({
 
           x:0,
@@ -685,12 +794,13 @@
 
 
  //Reset canvas (jako parametr podajemy obiekt canvasa)
-  $.fn.reset = function(layer){
+  $.fn.reset = reset
+ function reset(){
 
       return this.each(function(){
           that = $(this)[0];
 
-          that.clearRect(0, 0 , $(layer).width(), $(layer).heigth());
+          that.clearRect(0, 0, parseInt(that.canvas.width), parseInt(that.canvas.height));
       })
   }
 
