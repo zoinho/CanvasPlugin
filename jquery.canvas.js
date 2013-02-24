@@ -1,4 +1,4 @@
-
+ 
  $.fn.canvas = function(context){
  		var object = $(this)[0]
  		//default argument protection
@@ -43,6 +43,7 @@
      	'circle':'drawCircle',
      	'rectangle':'drawRectangle',
      	'text':'drawText',
+     	'image':'drawImage',
      	'stroke':'stroke',
      	'solid':'solidFill',
      	
@@ -313,7 +314,8 @@ function draw(){
 
  }
 
- $.fn.gradientFillSolid = function(options){
+ $.fn.gradientFillSolid = gradientFillSolid; 
+ function gradientFillSolid(options){
 
 
      var defaults = $.extend({
@@ -339,7 +341,8 @@ function draw(){
 
  }
 
- $.fn.gradientFillRadial = function(options){
+ $.fn.gradientFillRadial = gradientFillRadial
+ function gradientFillRadial(options){
 
 
      var defaults = $.extend({
@@ -369,7 +372,8 @@ function draw(){
  }
 
 
- $.fn.patternFill = function(options){
+ $.fn.patternFill = patternFill;
+ function patternFill(options){
 
 
      var defaults = $.extend({
