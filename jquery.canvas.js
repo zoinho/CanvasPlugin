@@ -33,7 +33,8 @@
  function pushObject(name,object){
  
  	 var defaults = $.extend({
-         fill:'stroke'
+         fill:{type:'stroke'}
+
      }, object);
      that = $(this)[0];
      that.functions = {
@@ -46,18 +47,28 @@
      	'image':'drawImage',
      	'stroke':'stroke',
      	'solid':'solidFill',
+        'solidGradient':'gradientFillSolid',
+        'radialGradient':'GradientFillRadial',
+         'pattern':'patternFill'
+
      	
+     }
+
+     that.transforms = {
+         'reset': [1, 0, 0, 1, 0, 0],
+         'shear':[1, 0, 0.75, 1, 0, 0],
+         'rotate':[0.52,0.85,-0.85,0.52,0,0]
      }
      
      if(that.hasOwnProperty("objects")){
-         console.log("sa objects")
          that.objects[name]=object;
      }else{
          that.objects ={};
          that.objects[name]=object;
      }
      that.objects[name].fn = that.functions[that.objects[name].type];
-     that.objects[name].fillType = that.functions[defaults.fill];
+     that.objects[name].fillType = that.functions[defaults.fill.type];
+     that.objects[name].transform = that.transforms['rotate'];
 
      return this.each(function(){
      
@@ -69,7 +80,6 @@
   function popObject(name){
      that = $(this)[0];
      if(that.hasOwnProperty("objects")){
-         console.log("sa objects")
          delete that.objects[name];
      }
      return this.each(function(){
@@ -128,11 +138,13 @@ function draw(){
 	   return this.each(function(){
 	  
 	   for (object in that.objects){
-	   		var obj = that.objects[object], fn = obj.fn, fillType = obj.fillType
+
+           var obj = that.objects[object],
+                fn = obj.fn,
+                fillType = obj.fillType
 	   		
-	   		console.log(fn);
 	   		$(that)[fn](obj);
-	   		$(that)[fillType]();
+           $(that)[fillType](obj.fill);
 	   		
 	   		
 	   }
@@ -207,7 +219,6 @@ function draw(){
      that = $(this)[0];
 
      that.beginPath();
-         console.log(that);
      that.moveTo(defaults.controlPointsX[0],defaults.controlPointsY[0])
      for (var i =1; i<lengthX;i++){
      that.lineTo(defaults.controlPointsX[i],defaults.controlPointsY[i]);
@@ -294,6 +305,22 @@ function draw(){
  }
 
  //Fill types
+
+ //Color is color or object with fill parameters
+ $.fn.fill = fill;
+ function fill(name, options){
+
+     var that = $(this)[0], obj = that.objects[name];
+
+     $(that)['reset']();
+     return this.each(function(){
+
+             obj.fill = options;
+             $(that)['popObject'](name);
+             $(that)['pushObject'](name,obj);
+         })
+ }
+
  $.fn.solidFill = solidFill;
  function solidFill(options){
 
@@ -313,6 +340,7 @@ function draw(){
      })
 
  }
+
 
  $.fn.gradientFillSolid = gradientFillSolid; 
  function gradientFillSolid(options){
@@ -360,7 +388,6 @@ function draw(){
      that = $(this)[0];
 
      var grd =  that.createRadialGradient(defaults.startX,defaults.startY, defaults.startRadius,defaults.endX, defaults.endY, defaults.endRadius), colorsLength = defaults.colors.length;
-     console.log("dupa")
      for (var i=0; i<colorsLength; i++){
 
              grd.addColorStop(i,defaults.colors[i]);
@@ -401,11 +428,10 @@ function draw(){
 
 
      var defaults = $.extend({
-        lineWidth:1,
-         lineColor:"#000000",
-         lineCap:"round",
-         linelJoin:'butt',
-         text: false
+        width:1,
+         color:"#000000",
+         cap:"round",
+         join:'butt'
 
      }, options);
 
@@ -413,10 +439,10 @@ function draw(){
 
      that = $(this)[0];
 
-         that.lineWidth = defaults.lineWidth;
-     that.lineJoin = defaults.lineJoin;
-     that.strokeStyle = defaults.lineColor;
-     that.lineCap = defaults.lineCap;
+         that.lineWidth = defaults.width;
+     that.lineJoin = defaults.join;
+     that.strokeStyle = defaults.color;
+     that.lineCap = defaults.cap;
      if (defaults.text){
      } else {
      that.stroke();
@@ -433,10 +459,10 @@ function draw(){
 
 
      var defaults = $.extend({
-         startX:238,
-         startY:50,
-         endX:238,
-         endY:50
+         x:238,
+         y:50,
+         endx:238,
+         endy:50
      }, options);
 
      return this.each(function(){
@@ -444,7 +470,7 @@ function draw(){
      that = $(this)[0];
 
       that.beginPath();
-     that.rect(defaults.startX, defaults.startY, defaults.endX, defaults.endY);
+     that.rect(defaults.x, defaults.y, defaults.endx, defaults.endy);
      });
 
  }
@@ -486,7 +512,7 @@ function draw(){
      dheight:50
   }
 */
-
+// TODO sprawdzic image
   $.fn.drawImage = drawImage;
   function drawImage(object, options){
 
@@ -529,7 +555,7 @@ function draw(){
 
 
  //fonts
-
+//TODO zrobic fonty
   $.fn.drawText = drawText;
    function drawText(options){
 
@@ -607,10 +633,9 @@ function draw(){
  // Transforms
 
   $.fn.translate = translate;
-  function translate(object,options){
+  function translate(name,options){
 	
-		var name = object, 
-		tmp=that.objects[name],
+		var obj=that.objects[name],
 		defaults = $.extend({
 
           x:0,
@@ -620,46 +645,42 @@ function draw(){
           that = $(this)[0];
 
 			$(that)['popObject'](name);
-			tmp.x=defaults.x;
-			tmp.y=defaults.y;
-			$(that)['pushObject'](name,tmp);
-			$(that)['draw']();
-          
+			obj.x=defaults.x;
+			obj.y=defaults.y;
+			$(that)['pushObject'](name,obj);
+
       })
   }
     $.fn.translateX = translateX;
-  function translateX(object,coord){
-	
-		var name = object, 
-		tmp=that.objects[name];
+  function translateX(name,coord){
+
+      var obj=that.objects[name];
 	
       return this.each(function(){
           that = $(this)[0];
 
 			$(that)['popObject'](name);
-			tmp.x=coord;
-			$(that)['pushObject'](name,tmp);
-			$(that)['draw']();
-          
+			obj.x=coord;
+			$(that)['pushObject'](name,obj);
+
       })
   }
     $.fn.translateY = translateY;
-  function translateY(object,coord){
+  function translateY(name,coord){
 	
-		var name = object, 
-		tmp=that.objects[name];
+
+		var obj=that.objects[name];
 		
       return this.each(function(){
           that = $(this)[0];
 
 			$(that)['popObject'](name);
-			tmp.y=coord;
-			$(that)['pushObject'](name,tmp);
-			$(that)['draw']();
-          
+			obj.y=coord;
+			$(that)['pushObject'](name,obj);
+
       })
   }
-  $.fn.translateCanvas = function(object,options){
+  $.fn.translateCanvas = function(options){
 	
       var defaults = $.extend({
 
@@ -673,45 +694,36 @@ function draw(){
       })
   }
 
-  $.fn.scale = function(options){
+  $.fn.transformObject = function(name){
 
-      var defaults = $.extend({
+      var  obj = that.objects[name]
 
-          x:0,
-          y:0
-      }, options);
       return this.each(function(){
           that = $(this)[0];
-          that.scale(defaults.x, defaults.y);
+
+          var objects = that.objects;
+
+            $(that)['popObject'](name);
+          that.save();
+
+          that.translate(obj.x,obj.y);
+          $(that).transform(obj.transform);
+
+          $(that)[obj.fn](obj);
+          $(that)[obj.fillType](obj.fill);
+           that.objects[name]=obj;
+
+          that.restore();
+
       })
   }
-  $.fn.rotate = function(options){
 
-      var defaults = $.extend({
+  $.fn.transform = function(transform){
 
-          angle:0
-      }, options);
       return this.each(function(){
           that = $(this)[0];
-
-          that.rotate(defaults.angle);
-      })
-  }
-  $.fn.transform = function(options){
-
-      var defaults = $.extend({
-
-          a:0,
-          b:0,
-          c:0,
-          d:0,
-          e:0,
-          f:0
-      }, options);
-      return this.each(function(){
-          that = $(this)[0];
-
-          that.transform(defaults.a, defaults.b, defaults.c, defaults.d, defaults.e, defaults.f)
+            console.log(transform);
+          that.transform(transform[0], transform[1], transform[2], transform[3], transform[4], transform[5])
       })
   }
 
