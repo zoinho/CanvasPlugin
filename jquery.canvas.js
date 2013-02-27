@@ -57,7 +57,7 @@
      that.transforms = {
          'reset': [1, 0, 0, 1, 0, 0],
          'shear':[1, 0, 0.75, 1, 0, 0],
-         'rotate':[0.52,0.85,-0.85,0.52,0,0]
+         'rotate':[0.70,0.70,-0.70,0.70,0,0]
      }
      
      if(that.hasOwnProperty("objects")){
@@ -68,7 +68,8 @@
      }
      that.objects[name].fn = that.functions[that.objects[name].type];
      that.objects[name].fillType = that.functions[defaults.fill.type];
-     that.objects[name].transform = that.transforms['rotate'];
+     that.objects[name].transform = that.transforms['reset'];
+     $(that)[object.type](name);
 
      return this.each(function(){
      
@@ -142,10 +143,11 @@ function draw(){
            var obj = that.objects[object],
                 fn = obj.fn,
                 fillType = obj.fillType
-	   		
+
 	   		$(that)[fn](obj);
            $(that)[fillType](obj.fill);
-	   		
+           if(obj.shadow) { $(that)['shadow'](obj.shadow) ;}
+           $(that)['transformObject'](object);
 	   		
 	   }
 	   
@@ -209,22 +211,37 @@ function draw(){
 
      var defaults = $.extend({
 
-         controlPointsX:[0,10,50,37,200],
-         controlPointsY:[0,150,350,20,600]
+         x:[0,10,50,37,200],
+         y:[0,150,350,20,600]
 
 
      }, options);
      return this.each(function(){
-         var lengthX = defaults.controlPointsX.length;
+         var lengthX = defaults.x.length;
      that = $(this)[0];
 
      that.beginPath();
-     that.moveTo(defaults.controlPointsX[0],defaults.controlPointsY[0])
+     that.moveTo(defaults.x[0],defaults.y[0])
      for (var i =1; i<lengthX;i++){
-     that.lineTo(defaults.controlPointsX[i],defaults.controlPointsY[i]);
+     that.lineTo(defaults.x[i],defaults.y[i]);
      }
 
      })
+
+ }
+
+ $.fn.path = path;
+ function path(name){
+     var obj = that.objects[name], metrics={}, X=obj.x, Y=obj.y;
+
+     X.sort(function(a,b){return a-b});
+     Y.sort(function(a,b){return a-b});
+
+     metrics.width = X[X.length-1] - X[0];
+     metrics.height = Y[Y.length-1] - Y[0];
+
+     that.objects[name].metrics=metrics;
+
 
  }
 
@@ -248,6 +265,20 @@ function draw(){
      that.arc(defaults.x, defaults.y, defaults.radius, defaults.startAngle*Math.PI, defaults.endAngle*Math.PI, defaults.counterClockwise);
 
      })
+
+ }
+
+
+ $.fn.arc = arc;
+ function arc(name){
+     var obj = that.objects[name], metrics={};
+
+
+     metrics.width = obj.radius;
+     metrics.height = obj.radius;
+
+     that.objects[name].metrics=metrics;
+
 
  }
 
@@ -293,6 +324,22 @@ function draw(){
      })
 
  }
+
+ $.fn.curve = curve;
+ function curve(name){
+     var obj = that.objects[name], metrics={}, X=obj.x, Y=obj.y;
+
+     X.sort(function(a,b){return a-b});
+     Y.sort(function(a,b){return a-b});
+
+     metrics.width = X[X.length-1] - X[0];
+     metrics.height = Y[Y.length-1] - Y[0];
+    console.log(metrics);
+     that.objects[name].metrics=metrics;
+
+
+ }
+
  //closing path
  $.fn.close = function(){
      return this.each(function(){
@@ -342,7 +389,7 @@ function draw(){
  }
 
 
- $.fn.gradientFillSolid = gradientFillSolid; 
+ $.fn.gradientFillSolid = gradientFillSolid;
  function gradientFillSolid(options){
 
 
@@ -461,8 +508,8 @@ function draw(){
      var defaults = $.extend({
          x:238,
          y:50,
-         endx:238,
-         endy:50
+         width:238,
+         height:50
      }, options);
 
      return this.each(function(){
@@ -470,8 +517,20 @@ function draw(){
      that = $(this)[0];
 
       that.beginPath();
-     that.rect(defaults.x, defaults.y, defaults.endx, defaults.endy);
+     that.rect(defaults.x, defaults.y, defaults.width, defaults.height);
      });
+
+ }
+
+ $.fn.rectangle = rectangle;
+ function rectangle(name){
+     var obj = that.objects[name], metrics={};
+
+     metrics.width = obj.width;
+     metrics.height = obj.height;
+
+     that.objects[name].metrics=metrics;
+
 
  }
 
@@ -492,6 +551,19 @@ function draw(){
      that.beginPath();
      that.arc(defaults.x, defaults.y, defaults.radius, 0, 2*Math.PI, false);
      })
+
+ }
+
+ $.fn.circle = circle;
+ function circle(name){
+     var obj = that.objects[name], metrics={};
+
+
+     metrics.width = obj.radius;
+     metrics.height = obj.radius;
+
+     that.objects[name].metrics=metrics;
+
 
  }
 
@@ -553,6 +625,18 @@ function draw(){
 
   }
 
+ $.fn.image = image;
+ function image(name){
+     var obj = that.objects[name], metrics={};
+
+
+     metrics.width = obj.width;
+     metrics.height = obj.height;
+
+     that.objects[name].metrics=metrics;
+
+
+ }
 
  //fonts
 //TODO zrobic fonty
@@ -644,10 +728,9 @@ function draw(){
       return this.each(function(){
           that = $(this)[0];
 
-			$(that)['popObject'](name);
 			obj.x=defaults.x;
 			obj.y=defaults.y;
-			$(that)['pushObject'](name,obj);
+			$(that)['draw']();
 
       })
   }
@@ -659,9 +742,8 @@ function draw(){
       return this.each(function(){
           that = $(this)[0];
 
-			$(that)['popObject'](name);
 			obj.x=coord;
-			$(that)['pushObject'](name,obj);
+			$(that)['draw']();
 
       })
   }
@@ -674,9 +756,9 @@ function draw(){
       return this.each(function(){
           that = $(this)[0];
 
-			$(that)['popObject'](name);
+
 			obj.y=coord;
-			$(that)['pushObject'](name,obj);
+			$(that)['draw']();
 
       })
   }
@@ -694,29 +776,46 @@ function draw(){
       })
   }
 
-  $.fn.transformObject = function(name){
+  $.fn.transformObject = transformObject;
+ function transformObject(name){
 
-      var  obj = that.objects[name]
+      var  obj = that.objects[name], obj_x = obj.x, obj_y = obj.y;
 
       return this.each(function(){
           that = $(this)[0];
 
           var objects = that.objects;
 
+
+
             $(that)['popObject'](name);
           that.save();
+          if (obj.x instanceof Array){
 
-          that.translate(obj.x,obj.y);
+          }else{
+              obj.x=0 - obj.metrics.width/2;
+              obj.y=0 - obj.metrics.height/2;
+          }
+
+
+          that.translate(obj_x + obj.metrics.width/2, obj_y + obj.metrics.height/2);
           $(that).transform(obj.transform);
-
           $(that)[obj.fn](obj);
           $(that)[obj.fillType](obj.fill);
+          obj.x=obj_x;
+          obj.y=obj_y;
            that.objects[name]=obj;
 
           that.restore();
 
       })
   }
+ $.fn.setTransform = function(name,type){
+
+     that.objects[name].transform = that.transforms[type];
+     $(that)['draw']();
+     return this.each(function(){})
+ }
 
   $.fn.transform = function(transform){
 
@@ -727,73 +826,31 @@ function draw(){
       })
   }
 
-  $.fn.shear = function(options){
-
-      var defaults = $.extend({
-
-          sx:0,
-          sy:0
-      }, options);
-      return this.each(function(){
-          that = $(this)[0];
-
-          that.transform(1 ,defaults.sy, defaults.sx, 1, 0, 0);
-      })
-  }
-
-  $.fn.resetTransform = function(options){
-
-      return this.each(function(){
-          that = $(this)[0];
-
-          that.setTransform(1, 0, 0, 1, 0, 0);
-      })
-  }
 
  ///TODO dopisac customowe transformacje macierzy przekstałceń
 
   //Shadows
 
-  $.fn.shadowColor = function(options){
+ $.fn.shadow = shadow;
+ function shadow(options){
 
       var defaults = $.extend({
 
-          color:'black'
+          color:'black',
+          blur:0,
+          offsetX:10,
+          offsetY:10,
       }, options);
       return this.each(function(){
           that = $(this)[0];
 
-          that.shadowColor(defaults.color);
+          that.shadowColor =defaults.color;
+          that.shadowBlur =defaults.blur;
+          that.shadowOffsetX=defaults.x;
+          that.shadowOffsetY=defaults.y;
       })
   }
 
-  $.fn.shadowBlur = function(options){
-
-      var defaults = $.extend({
-
-          blur:0
-      }, options);
-      return this.each(function(){
-          that = $(this)[0];
-
-          that.shadowBlur(defaults.blur);
-      })
-  }
-
-  $.fn.shadowOffset = function(options){
-
-      var defaults = $.extend({
-
-          x:10,
-          y:10
-      }, options);
-      return this.each(function(){
-          that = $(this)[0];
-
-          that.shadowOffsetX(defaults.x);
-          that.shadowOffsetY(defaults.y);
-      })
-  }
  //Opacity
   $.fn.opacity = function(options){
 
