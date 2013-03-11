@@ -877,3 +877,62 @@ function draw(){
       })
   }
 
+
+ //Drag&drop
+
+ $.fn.dragDrop = dragDrop;
+ function dragDrop(name){
+
+     return this.each(function(){
+         that = $(this)[0];
+         that.canvas.onmousedown = $(that)['myDown'](name);
+         that.canvas.onmouseup = $(that)['myUp'];
+     })
+ }
+
+ $.fn.undrag = undrag;
+ function undrag(){
+
+     that.canvas.onmousedown = null;
+         that.canvas.onmouseup = null;
+ }
+
+
+ $.fn.myDown = myDown;
+ function myDown(name){
+     var obj = that.objects[name];
+     that = $(this)[0];
+      return function(e){
+
+
+          console.log(e);
+          if (e.pageX < obj.x + that.canvas.offsetLeft +obj.width && e.pageX > obj.x + that.canvas.offsetLeft && e.pageY < obj.y + that.canvas.offsetTop + obj.height&&
+              e.pageY > obj.y + that.canvas.offsetTop){
+              that.dragok = true;
+              that.canvas.onmousemove = $(that)['myMove'](name);
+          }
+
+      }
+
+ }
+
+ $.fn.myUp = myUp;
+ function myUp(){
+        console.log("mouse up");
+     that.dragok = false;
+     that.canvas.onmousemove = null;
+ }
+
+ $.fn.myMove = myMove;
+ function myMove(name){
+     that = $(this)[0];
+     return function(e){
+         console.log(name);
+         if (that.dragok){
+             $(that)['translateX'](name,e.pageX - that.canvas.offsetLeft);
+             $(that)['translateY'](name,e.pageY - that.canvas.offsetTop);
+
+         }
+     }
+
+ }
