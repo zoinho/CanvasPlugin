@@ -1045,25 +1045,29 @@ function draw(){
      R = HexToR(obj.fill.HEX),
      G = HexToG(obj.fill.HEX),
      B = HexToB(obj.fill.HEX),
-     O = obj.opacity;
+     O = obj.opacity,
+     running = true;
 
 
      var anim =setInterval(function(){
-
+        if(running){
 
         if (O >0){
-            O-=0.1;
-            console.log(O);
+            O-=0.01;
+
             obj.fill.color = 'rgba('+R+','+G+','+B+','+O+')';
 
 
+        }else{
+            running = false;
         }
 
          $(that)['draw']();
          obj.opacity = O;
 
+        }
      }, speed);
-     obj.anim = 0;
+
      obj.anim = anim;
      return anim;
 
@@ -1077,26 +1081,29 @@ function draw(){
      R = HexToR(obj.fill.HEX),
      G = HexToG(obj.fill.HEX),
      B = HexToB(obj.fill.HEX),
-     O = obj.opacity;
+     O = obj.opacity,
+     running = true;
 
 
      var anim =setInterval(function(){
-
+        if(running){
 
          if(O < 1.0){
 
-             O += 0.1;
+             O += 0.01;
 
              obj.fill.color = 'rgba('+R+','+G+','+B+','+O+')';
 
 
+         }else {
+             running=false;
          }
 
          $(that)['draw']();
          obj.opacity = O;
-
+        }
      }, speed);
-     obj.anim = O;
+
      obj.anim = anim;
      return anim;
 
@@ -1107,7 +1114,7 @@ function draw(){
  function cancelAnimation(name){
 
      var obj = that.objects[name];
-
+     console.log(obj.anim);
      clearInterval(obj.anim);
  }
 
