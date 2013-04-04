@@ -69,6 +69,8 @@
      that.objects[name].fn = that.functions[that.objects[name].type];
      that.objects[name].fillType = that.functions[defaults.fill.type];
      that.objects[name].transform = that.transforms['reset'];
+     that.objects[name].opacity = 1;
+     that.objects[name].fill.HEX = that.objects[name].fill.color;
      $(that)[object.type](name);
 
      return this.each(function(){
@@ -334,7 +336,6 @@ function draw(){
 
      metrics.width = X[X.length-1] - X[0];
      metrics.height = Y[Y.length-1] - Y[0];
-    console.log(metrics);
      that.objects[name].metrics=metrics;
 
 
@@ -821,7 +822,6 @@ function draw(){
 
       return this.each(function(){
           that = $(this)[0];
-            console.log(transform);
           that.transform(transform[0], transform[1], transform[2], transform[3], transform[4], transform[5])
       })
   }
@@ -839,7 +839,7 @@ function draw(){
           color:'black',
           blur:0,
           offsetX:10,
-          offsetY:10,
+          offsetY:10
       }, options);
       return this.each(function(){
           that = $(this)[0];
@@ -905,7 +905,6 @@ function draw(){
       return function(e){
 
 
-          console.log(e);
           if (e.pageX < obj.x + that.canvas.offsetLeft +obj.width && e.pageX > obj.x + that.canvas.offsetLeft && e.pageY < obj.y + that.canvas.offsetTop + obj.height&&
               e.pageY > obj.y + that.canvas.offsetTop){
               that.dragok = true;
@@ -918,7 +917,6 @@ function draw(){
 
  $.fn.myUp = myUp;
  function myUp(){
-        console.log("mouse up");
      that.dragok = false;
      that.canvas.onmousemove = null;
  }
@@ -927,7 +925,6 @@ function draw(){
  function myMove(name){
      that = $(this)[0];
      return function(e){
-         console.log(name);
          if (that.dragok){
              $(that)['translateX'](name,e.pageX - that.canvas.offsetLeft);
              $(that)['translateY'](name,e.pageY - that.canvas.offsetTop);
@@ -936,3 +933,188 @@ function draw(){
      }
 
  }
+
+
+ // Animations
+
+
+ $.fn.animateX = animateX;
+ function animateX(name, speed){
+
+     var obj = that.objects[name], x;
+     var anim =setInterval(function(){
+
+         if (obj.x + obj.width > that.canvas.width || obj.x + obj.width < 0){
+             return false;
+         }
+
+
+
+        obj.x++;
+
+        $(that)['translateX'](name, obj.x);
+
+
+
+     }, speed);
+
+     obj.anim = anim;
+     return anim;
+
+ }
+
+
+ $.fn.animateY = animateY;
+ function animateY(name, speed){
+
+     var obj = that.objects[name], x;
+     var anim =setInterval(function(){
+
+         if (obj.y + obj.height > that.canvas.height || obj.y + obj.height < 0){
+             return false;
+         }
+
+
+             obj.y++;
+
+             $(that)['translateY'](name, obj.y);
+
+     }, speed);
+
+     obj.anim = anim;
+     return anim;
+
+ }
+
+ $.fn.bounceY = bounceY;
+ function bounceY(name, speed){
+
+     var obj = that.objects[name], x=1;
+     var anim =setInterval(function(){
+
+
+
+         if (obj.y < 0 || obj.y+obj.height > that.canvas.height){
+
+             x = -x;
+
+
+         }
+
+         obj.y+=x;
+         $(that)['translateY'](name, obj.y+x);
+
+     }, speed);
+
+     obj.anim = anim;
+     return anim;
+
+ }
+
+ $.fn.bounceX = bounceX;
+ function bounceX(name, speed){
+
+     var obj = that.objects[name], x=1;
+     var anim =setInterval(function(){
+
+
+
+         if (obj.x < 0 || obj.x+obj.width > that.canvas.width){
+
+             x = -x;
+
+
+         }
+
+         obj.x+=x;
+         $(that)['translateX'](name, obj.x+x);
+
+     }, speed);
+
+     obj.anim = anim;
+     return anim;
+
+ }
+
+ $.fn.fade = fade;
+ function fade(name, speed){
+
+
+
+     var obj = that.objects[name],
+     R = HexToR(obj.fill.HEX),
+     G = HexToG(obj.fill.HEX),
+     B = HexToB(obj.fill.HEX),
+     O = obj.opacity;
+
+
+     var anim =setInterval(function(){
+
+
+        if (O >0){
+            O-=0.1;
+            console.log(O);
+            obj.fill.color = 'rgba('+R+','+G+','+B+','+O+')';
+
+
+        }
+
+         $(that)['draw']();
+         obj.opacity = O;
+
+     }, speed);
+     obj.anim = 0;
+     obj.anim = anim;
+     return anim;
+
+ }
+
+ $.fn.show = show;
+ function show(name, speed){
+
+
+     var obj = that.objects[name],
+     R = HexToR(obj.fill.HEX),
+     G = HexToG(obj.fill.HEX),
+     B = HexToB(obj.fill.HEX),
+     O = obj.opacity;
+
+
+     var anim =setInterval(function(){
+
+
+         if(O < 1.0){
+
+             O += 0.1;
+
+             obj.fill.color = 'rgba('+R+','+G+','+B+','+O+')';
+
+
+         }
+
+         $(that)['draw']();
+         obj.opacity = O;
+
+     }, speed);
+     obj.anim = O;
+     obj.anim = anim;
+     return anim;
+
+ }
+
+
+ $.fn.cancelAnimation = cancelAnimation;
+ function cancelAnimation(name){
+
+     var obj = that.objects[name];
+
+     clearInterval(obj.anim);
+ }
+
+
+ //Other functions
+
+ function HexToR(h) {return parseInt((cutHex(h)).substring(0,2),16)}
+ function HexToG(h) {return parseInt((cutHex(h)).substring(2,4),16)}
+ function HexToB(h) {return parseInt((cutHex(h)).substring(4,6),16)}
+ function cutHex(h) {return (h.charAt(0)=="#") ? h.substring(1,7):h}
