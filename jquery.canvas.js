@@ -706,11 +706,7 @@ function draw(){
 
           baseline:"alphabetic"
       }, options);
-      return this.each(function(){
-          that = $(this)[0];
 
-          that.textBaseline(defaults.baseline);
-      })
 
   }
 
@@ -1118,6 +1114,64 @@ function draw(){
      clearInterval(obj.anim);
  }
 
+//Video Capture
+
+ $.fn.videoInit = function(options){
+
+     var def = $.extend({
+         width:"320",
+         height:"240",
+         controls:''
+     }, options);
+
+     return this.each(function(){
+         that = $(this)[0];
+         if (userMediaDetection()) {
+             $(that).append('<video autoplay '+ def.controls+' id="video" width="' + def.width + 'px" height="'+def.height+'px" style="border:1px solid green"></video>')
+
+         } else {
+             console.error('getUserMedia() is not supported in your browser');
+         }
+     })
+ }
+
+ $.fn.startVideo = function(options){
+
+     var def = $.extend({
+         video:true,
+         audio:true
+     }, options);
+
+     return this.each(function(){
+         that = $(this)[0];
+         window.URL = window.URL || window.webkitURL;
+         navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia ||
+             navigator.mozGetUserMedia || navigator.msGetUserMedia;
+
+         var video = document.getElementById('video');
+
+         if (navigator.getUserMedia) {
+             navigator.getUserMedia({video:def.video, audio:def.audio}, function(stream) {
+                 video.src = window.URL.createObjectURL(stream);
+             }, console.log("dupa"));
+         }
+
+     })
+ }
+
+ $.fn.screenShot = function(context){
+
+     return this.each(function(){
+         that = $(this)[0];
+         if($(that).children("video").attr("src")){
+             context.drawImage(video, 0, 0);
+
+         }
+
+     })
+ }
+
+
 
  //Other functions
 
@@ -1125,3 +1179,9 @@ function draw(){
  function HexToG(h) {return parseInt((cutHex(h)).substring(2,4),16)}
  function HexToB(h) {return parseInt((cutHex(h)).substring(4,6),16)}
  function cutHex(h) {return (h.charAt(0)=="#") ? h.substring(1,7):h}
+
+ function userMediaDetection() {
+
+     return !!(navigator.getUserMedia || navigator.webkitGetUserMedia ||
+         navigator.mozGetUserMedia || navigator.msGetUserMedia);
+ }
