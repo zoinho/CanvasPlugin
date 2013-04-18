@@ -1069,8 +1069,8 @@ function draw(){
 
  }
 
- $.fn.show = show;
- function show(name, speed){
+ $.fn.showOut = showOut;
+ function showOut(name, speed){
 
 
      var obj = that.objects[name],
@@ -1170,6 +1170,63 @@ function draw(){
 
      })
  }
+// Lazy loading Images
+
+ /**
+  * Skrypt w dużej mierze bazowany na
+  * * jQuery Unveil
+  * A very lightweight jQuery plugin to lazy load images
+  * http://luis-almeida.github.com/unveil
+  *
+  * Licensed under the MIT license.
+  * Copyright 2013 Luís Almeida
+  * https://github.com/luis-almeida
+  */
+
+ $.fn.lazyLoad = function(threshold) {
+
+     var $w = $(window),
+         th = threshold || 0,
+         attrib ="data-src",
+         images = this,
+         loaded,
+         inview,
+         source;
+
+     this.one("lazyLoad", function() {
+         source = this.getAttribute(attrib);
+         source = source || this.getAttribute("data-src");
+         if (source){
+
+             $(this).attr("src", source);
+
+         }
+
+     });
+
+     function lazyLoad() {
+         inview = images.filter(function() {
+             var $e = $(this),
+                 wt = $w.scrollTop(),
+                 wb = wt + $w.height(),
+                 et = $e.offset().top,
+                 eb = et + $e.height();
+
+             return eb >= wt - th && et <= wb + th;
+         });
+
+         loaded = inview.trigger("lazyLoad");
+         images = images.not(loaded);
+     }
+
+     $w.scroll(lazyLoad);
+     $w.resize(lazyLoad);
+
+     lazyLoad();
+
+     return this;
+
+ };
 
 
 
@@ -1185,3 +1242,9 @@ function draw(){
      return !!(navigator.getUserMedia || navigator.webkitGetUserMedia ||
          navigator.mozGetUserMedia || navigator.msGetUserMedia);
  }
+
+
+ $(document).ready(function(){
+
+     $("li img").lazyLoad();
+ })
