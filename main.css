@@ -1,0 +1,51 @@
+body {
+	font-family: 'Titillium Web', sans-serif;
+	color: #466148;
+	background: -moz-linear-gradient(top, rgba(215,180,15,1) 0%, rgba(218,148,22,0) 100%); /* FF3.6+ */
+	background:#8DC73F;
+}
+h1 {
+font-weight:200;
+}
+h3 {
+font-weight:300;
+}
+canvas{
+	border-radius:15px;
+	background:white;
+}
+
+.generate, .start{
+	color:white;
+	background:#2A353C;
+	border-radius:10px;
+	border:none;
+	font-weight:200;
+	font-size:12px;
+	padding:10px 15px;
+
+}
+.start{
+	display:none;	
+}
+.canvas_wrapper{
+	margin:0 auto;
+	padding:0;
+	text-align:center;
+	
+}
+.trashDiv{
+	margin:0 auto;
+	padding:0;
+	text-align:center;
+}
+video {
+	border:2px solid #2A353C;
+	border-radius:15px;
+	}
+ul li {
+	float: left;
+	clear: both;
+	display: block;
+}
+

@@ -70,7 +70,7 @@
      that.objects[name].fillType = that.functions[defaults.fill.type];
      that.objects[name].transform = that.transforms['reset'];
      that.objects[name].opacity = 1;
-     that.objects[name].fill.HEX = that.objects[name].fill.color;
+     that.objects[name].fill.HEX = defaults.fill.color;
      $(that)[object.type](name);
 
      return this.each(function(){
@@ -1130,7 +1130,7 @@ function draw(){
              $(that).append('<video autoplay '+ def.controls+' id="video" width="' + def.width + 'px" height="'+def.height+'px" style="border:1px solid green"></video>')
 
          } else {
-             console.error('getUserMedia() is not supported in your browser');
+             console.log('getUserMedia() is not supported in your browser');
          }
      })
  }
@@ -1151,9 +1151,20 @@ function draw(){
          var video = document.getElementById('video');
 
          if (navigator.getUserMedia) {
-             navigator.getUserMedia({video:def.video, audio:def.audio}, function(stream) {
-                 video.src = window.URL.createObjectURL(stream);
-             }, console.log("dupa"));
+
+          navigator.getUserMedia({video:def.video, audio:def.audio}, function(stream) {
+
+                 if (video.mozSrcObject !== undefined) {
+                     video.mozSrcObject = stream;
+                 } else {
+                     video.src = (window.URL && window.URL.createObjectURL(stream)) || stream;
+                 }
+                 video.play();
+
+             },  function (error) {
+                 console.error('An error occurred: [CODE ' + error.code + ']');
+
+             });
          }
 
      })

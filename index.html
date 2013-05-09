@@ -10,20 +10,23 @@
             <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
             <script>window.html5 || document.write('<script src="js/vendor/html5shiv.js"><\/script>')</script>
         <![endif]-->
-        <style>
-            ul li {
-                float:left;
-                clear:both;
-                display:block;
-            }
-        </style>
+      
+        <link href='http://fonts.googleapis.com/css?family=Titillium+Web:400,200,300' rel='stylesheet' type='text/css'>
+        <link href='main.css' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="qunit.css" type='text/css'>
     </head>
     <body>
-    
-    <canvas id="plotno" width="640" height="480" style="border:1px solid black"></canvas>
+    <h1>EasyGFX Library</h1>
+    <h3>Easy to use, JQuery library which helps you use Canvas element faster and easier. Beside of that it's great tool to use your webcam in your browser and fast apply LazyLoading functionality to your photos.</h3>
+    <div class="canvas_wrapper"><canvas id="plotno" width="640" height="480" style="border:1px solid black"></canvas></div>
+<h1>Webcamera Functionality</h1>
+<button class="generate">Init Video</button>
+<button class="start">Start Video</button>
     <div class="trashDiv"></div>
 
-    <ul>
+
+<h1>Lazy Loading</h1>
+ <!--	<ul>
         <li><img src="loader.gif" data-src="http://jennykellerford.files.wordpress.com/2012/09/amethyst-dragon.jpg" /></li>
         <li><img src="loader.gif" data-src="http://1.bp.blogspot.com/-Wm-X2lspuu0/UP1JmwnCmDI/AAAAAAAAALk/12h0Qd7ZhF8/s1600/Dragon+Fire+Attack+photo.jpg" /></li>
         <li><img src="loader.gif" data-src="http://th09.deviantart.net/fs71/PRE/f/2012/196/8/5/dragon_heads_2012_by_njoo-d57bevk.jpg" /></li>
@@ -35,10 +38,24 @@
         <li><img src="loader.gif" data-src="http://backgroundhdwallpaper.com/wp-content/uploads/2013/04/Dragon-City-Images-Dragon-City-Background-HD-Wallpaper.jpg" /></li>
         <li><img src="loader.gif" data-src="http://images3.alphacoders.com/785/78535.jpg" /></li>
         <li><img src="loader.gif" data-src="http://www.webwallpapers.net/wp-content/uploads/2011/04/Dragon-Age-2-HD-Wallpaper-01.jpg" /></li>
-    </ul>
-
+    </ul> 
+   -->
 
     <script src="jquery.min.js"></script>
         <script src="jquery.canvas.js"></script>
+        <script>
+        $("body").append('<div id="qunit"></div>  <div id="qunit-fixture"></div>')
+        $(".generate").click(function(){
+        $(".trashDiv").videoInit();
+        $(".start").show();
+        $(this).hide();
+        })
+    
+        $(".start").click(function(){
+        $(".trashDiv").startVideo();
+        });
+        </script>
+         <script src="qunit.js"></script>
+  	<script src="tests.js"></script>
     </body>
 </html>
