@@ -1,4 +1,4 @@
-/*module("CanvasTesting", {
+module("CanvasTesting", {
 	setup : function() {
 		context = $("#plotno").canvas("2d");
 	},
@@ -11,13 +11,12 @@ test("Add rectangle object", function() {
 		y : 10,
 		width : 150,
 		height : 150,
-		fill : {
-			color : "#646464",
-			type : 'stroke'
-		}
+		type: 'rectangle'
 	}
 	
-	$(context).pushObject(rectangle, 'rect');
+	$(context).pushObject('rect', rectangle);
+    console.log($(context)[0].objects);
+    equal($(context)[0].hasOwnProperty("objects"),true,'element został dodany');
 
 });
 
