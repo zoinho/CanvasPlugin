@@ -33,7 +33,7 @@
  function pushObject(name,object){
  
  	 var defaults = $.extend({
-         fill:{type:'stroke', color: "#646464"}
+         fill:{type:'stroke', color: "red"}
 
      }, object);
      that = $(this)[0];
@@ -66,11 +66,11 @@
          that.objects ={};
          that.objects[name]=object;
      }
-     console.log(defaults.fill);
      that.objects[name].fn = that.functions[that.objects[name].type];
      that.objects[name].fillType = that.functions[defaults.fill.type];
      that.objects[name].transform = that.transforms['reset'];
      that.objects[name].opacity = 1;
+     that.objects[name].fill= defaults.fill,
      that.objects[name].fill.HEX = defaults.fill.color;
      $(that)[object.type](name);
 
